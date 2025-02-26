@@ -12,7 +12,7 @@
         <downloads>
             <downloadurl type="full" format="zip">https://github.com/TLWebdesignNL/Pretty-Reviews-Task-Scheduler-Plugin/archive/refs/tags/V1.0.0.zip</downloadurl>
         </downloads>
-        <sha256></sha256>
+        <sha256>ba315c3f70557e72bb086f4246fe7f17ea433cd376f3b773b304e0388cdf39c6</sha256>
         <tags>
             <tag>stable</tag>
         </tags>
