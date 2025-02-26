@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="4.1|5" type="plugin" group="task" method="upgrade">
+    <name>plg_task_prettyreviews</name>
+    <author>Tom van der Laan - TLWebdesign</author>
+    <creationDate>2025-02-26</creationDate>
+    <copyright>TLWebdesign</copyright>
+    <license>GNU General Public License version 3, or later</license>
+    <authorEmail>info@tlwebdesign.nl</authorEmail>
+    <authorUrl>https://www.tlwebdesign.nl</authorUrl>
+    <version>1.0.0</version>
+    <description>PLG_TASK_PRETTYREVIEWS_DESCRIPTION</description>
+    <namespace path="src">Joomla\Plugin\Task\Prettyreviews</namespace>
+    <files>
+        <folder plugin="prettyreviews">services</folder>
+        <folder>src</folder>
+        <folder>forms</folder>
+    </files>
+    <languages>
+        <language tag="en-GB">language/en-GB/plg_task_prettyreviews.ini</language>
+        <language tag="en-GB">language/en-GB/plg_task_prettyreviews.sys.ini</language>
+    </languages>
+    <updateservers>
+        <server type="extension" priority="1" name="Pretty Reviews Task Scheduler Plugin Updates">https://raw.githubusercontent.com/TLWebdesignNL/Pretty-Reviews-Task-Scheduler-Plugin/main/updates.xml</server>
+    </updateservers>
+</extension>
