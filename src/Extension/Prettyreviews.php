@@ -126,8 +126,7 @@ final class Prettyreviews extends CMSPlugin implements SubscriberInterface
 
 
                 // Construct AJAX URL
-                $joomlaRoot = Uri::root();
-                $url = $joomlaRoot . 'index.php?option=com_ajax&module=prettyreviews&method=updateGoogleReviews&format=json'
+                $url = Uri::root() . 'index.php?option=com_ajax&module=prettyreviews&method=updateGoogleReviews&format=json'
                     . '&moduleId=' . urlencode($moduleId)
                     . '&cid=' . urlencode($cid)
                     . '&apiKey=' . urlencode($apiKey)
