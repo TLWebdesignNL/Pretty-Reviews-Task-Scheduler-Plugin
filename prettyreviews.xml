@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension version="4.1|5" type="plugin" group="task" method="upgrade">
+<extension type="plugin" group="task" method="upgrade">
     <name>plg_task_prettyreviews</name>
     <author>Tom van der Laan - TLWebdesign</author>
-    <creationDate>2025-02-26</creationDate>
+    <creationDate>2026-01-29</creationDate>
     <copyright>TLWebdesign</copyright>
     <license>GNU General Public License version 3, or later</license>
     <authorEmail>info@tlwebdesign.nl</authorEmail>
     <authorUrl>https://www.tlwebdesign.nl</authorUrl>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <description>PLG_TASK_PRETTYREVIEWS_DESCRIPTION</description>
     <namespace path="src">Joomla\Plugin\Task\Prettyreviews</namespace>
     <files>
