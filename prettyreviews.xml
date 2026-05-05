@@ -7,7 +7,7 @@
     <license>GNU General Public License version 3, or later</license>
     <authorEmail>info@tlwebdesign.nl</authorEmail>
     <authorUrl>https://www.tlwebdesign.nl</authorUrl>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
     <description>PLG_TASK_PRETTYREVIEWS_DESCRIPTION</description>
     <namespace path="src">Joomla\Plugin\Task\Prettyreviews</namespace>
     <files>
@@ -18,6 +18,8 @@
     <languages>
         <language tag="en-GB">language/en-GB/plg_task_prettyreviews.ini</language>
         <language tag="en-GB">language/en-GB/plg_task_prettyreviews.sys.ini</language>
+        <language tag="nl-NL">language/nl-NL/plg_task_prettyreviews.ini</language>
+        <language tag="nl-NL">language/nl-NL/plg_task_prettyreviews.sys.ini</language>
     </languages>
     <updateservers>
         <server type="extension" priority="1" name="Pretty Reviews Task Scheduler Plugin Updates">https://raw.githubusercontent.com/TLWebdesignNL/Pretty-Reviews-Task-Scheduler-Plugin/main/updates.xml</server>

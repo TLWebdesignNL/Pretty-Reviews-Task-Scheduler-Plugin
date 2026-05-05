@@ -2,7 +2,15 @@
 <form>
     <fields name="params">
         <fieldset name="task_params">
-            <field name="moduleid" type="text" label="PLG_TASK_PRETTYREVIEWS_FIELD_MODULEID_LABEL" description="PLG_TASK_PRETTYREVIEWS_FIELD_MODULEID_DESC" default="" />
+            <field
+                name="moduleid"
+                type="number"
+                label="PLG_TASK_PRETTYREVIEWS_FIELD_MODULEID_LABEL"
+                description="PLG_TASK_PRETTYREVIEWS_FIELD_MODULEID_DESC"
+                default=""
+                filter="integer"
+                min="1"
+            />
         </fieldset>
     </fields>
 </form>

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * @package         Joomla.Plugins
  * @subpackage      Task.PrettyReviews
@@ -10,14 +12,14 @@
 
 namespace Joomla\Plugin\Task\Prettyreviews\Extension;
 
+use Joomla\CMS\Factory;
+use Joomla\CMS\Helper\HelperFactoryInterface;
 use Joomla\CMS\Plugin\CMSPlugin;
-use Joomla\CMS\Helper\ModuleHelper;
-use Joomla\CMS\Http\HttpFactory;
-use Joomla\CMS\Uri\Uri;
-use Joomla\CMS\Table\Table;
+use Joomla\CMS\Table\Module as ModuleTable;
 use Joomla\Component\Scheduler\Administrator\Event\ExecuteTaskEvent;
 use Joomla\Component\Scheduler\Administrator\Task\Status as TaskStatus;
 use Joomla\Component\Scheduler\Administrator\Traits\TaskPluginTrait;
+use Joomla\Database\DatabaseInterface;
 use Joomla\Event\DispatcherInterface;
 use Joomla\Event\SubscriberInterface;
 
@@ -95,11 +97,16 @@ final class Prettyreviews extends CMSPlugin implements SubscriberInterface
      */
     protected function updateReviews(ExecuteTaskEvent $event): int
     {
+        $params   = $event->getArgument('params');
+        $moduleId = (int) ($params->moduleid ?? 0);
 
-        $params = $event->getArgument('params');
-        $moduleId = $params->moduleid;
+        if ($moduleId <= 0) {
+            $this->logTask('Error: Missing Pretty Reviews module ID.', 'error');
+            return TaskStatus::NO_RUN;
+        }
 
-        $module = Table::getInstance('Module', 'JTable', []);
+        $db     = Factory::getContainer()->get(DatabaseInterface::class);
+        $module = new ModuleTable($db);
 
         if (!$module->load($moduleId)) {
             $this->logTask('Error: Module is not Pretty Reviews.', 'error');
@@ -107,60 +114,38 @@ final class Prettyreviews extends CMSPlugin implements SubscriberInterface
         }
 
         // Check if the module is 'mod_prettyreviews'
-        if ($module && $module->module === 'mod_prettyreviews') {
-            // Decode module params
-            $params = json_decode($module->params, true);
-
-            // Extract required parameters
-            $cid = $params['cid'] ?? null;
-            $apiKey = $params['apikey'] ?? null;
-            $reviewSort = $params['reviewsort'] ?? null;
-            $secret = $params['secret'] ?? null;
-
-            // Validate parameters
-            if (empty($cid) || empty($apiKey) || empty($reviewSort) || empty($secret)) {
-                $this->logTask('Error: Missing required parameters in Pretty Reviews module.', 'error');
-                return TaskStatus::KNOCKOUT;
-            } else {
-                $this->logTask('Fetching reviews for moduleId ' . $moduleId, 'info');
-
-
-                // Construct AJAX URL
-                $url = Uri::root() . 'index.php?option=com_ajax&module=prettyreviews&method=updateGoogleReviews&format=json'
-                    . '&moduleId=' . urlencode($moduleId)
-                    . '&cid=' . urlencode($cid)
-                    . '&apiKey=' . urlencode($apiKey)
-                    . '&reviewSort=' . urlencode($reviewSort)
-                    . '&secret=' . urlencode($secret);
-
-                // Initialize HTTP client
-                $http = HttpFactory::getHttp();
-
-                try {
-                    // Make GET request
-                    $response = $http->get($url);
-
-                    // Decode JSON response
-                    $data = json_decode($response->body, true);
-
-                    // Check if update was successful
-                    if (!empty($data['data']) && $data['data'] === true) {
-                        $this->logTask('Success: Reviews have been updated!', 'info');
-                    } else {
-                        $this->logTask('Error: Something went wrong with the AJAX request!', 'error');
-                        return TaskStatus::KNOCKOUT;
-                    }
-                } catch (Exception $e) {
-                    $this->logTask('Error: ' . $e->getMessage(), 'error');
-                    return TaskStatus::KNOCKOUT;
-
-                }
-            }
-        } else {
+        if ($module->module !== 'mod_prettyreviews' || (int) $module->client_id !== 0) {
             $this->logTask('Error: Module is not Pretty Reviews.', 'error');
             return TaskStatus::NO_RUN;
         }
 
+        $this->logTask('Fetching reviews for moduleId ' . $moduleId, 'info');
+
+        try {
+            $moduleExtension = Factory::getApplication()->bootModule('mod_prettyreviews', 'site');
+
+            if (!$moduleExtension instanceof HelperFactoryInterface) {
+                $this->logTask('Error: Pretty Reviews module helper factory is unavailable.', 'error');
+                return TaskStatus::KNOCKOUT;
+            }
+
+            $helper = $moduleExtension->getHelper('PrettyreviewsHelper');
+
+            if ($helper === null || !method_exists($helper, 'refreshFromGoogle')) {
+                $this->logTask('Error: Pretty Reviews 1.2.0 or newer is required.', 'error');
+                return TaskStatus::KNOCKOUT;
+            }
+
+            if (!$helper->refreshFromGoogle($moduleId)) {
+                $this->logTask('Error: Pretty Reviews did not write the review cache.', 'error');
+                return TaskStatus::KNOCKOUT;
+            }
+        } catch (\Throwable $e) {
+            $this->logTask('Error: ' . $e->getMessage(), 'error');
+            return TaskStatus::KNOCKOUT;
+        }
+
+        $this->logTask('Success: Reviews have been updated!', 'info');
         $this->logTask('Completed updating reviews for moduleId ' . $moduleId, 'info');
 
         return TaskStatus::OK;
