@@ -28,11 +28,11 @@ return new class () implements ServiceProviderInterface {
      *
      * @since   4.2.0
      */
-    public function register(Container $container)
+    public function register(Container $container): void
     {
         $container->set(
             PluginInterface::class,
-            function (Container $container) {
+            function (Container $container): PluginInterface {
                 $dispatcher = $container->get(DispatcherInterface::class);
 
                 $plugin = new Prettyreviews(

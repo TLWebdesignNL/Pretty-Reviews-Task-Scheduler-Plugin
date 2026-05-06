@@ -4,13 +4,23 @@
         <fieldset name="task_params">
             <field
                 name="moduleid"
-                type="number"
+                type="sql"
                 label="PLG_TASK_PRETTYREVIEWS_FIELD_MODULEID_LABEL"
                 description="PLG_TASK_PRETTYREVIEWS_FIELD_MODULEID_DESC"
                 default=""
-                filter="integer"
-                min="1"
-            />
+                filter="intarray"
+                key_field="id"
+                layout="joomla.form.field.list-fancy-select"
+                multiple="true"
+                sql_select="id, CONCAT(title, ' (#', id, ')') AS title"
+                sql_from="#__modules"
+                sql_where="module = 'mod_prettyreviews' AND client_id = 0"
+                sql_order="title ASC"
+                value_field="title"
+                validate="options"
+            >
+                <option value="">PLG_TASK_PRETTYREVIEWS_FIELD_MODULEID_SELECT</option>
+            </field>
         </fieldset>
     </fields>
 </form>

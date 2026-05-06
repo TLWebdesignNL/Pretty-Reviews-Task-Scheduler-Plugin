@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * @package         Joomla.Plugins
  * @subpackage      Task.PrettyReviews
@@ -97,29 +95,22 @@ final class Prettyreviews extends CMSPlugin implements SubscriberInterface
      */
     protected function updateReviews(ExecuteTaskEvent $event): int
     {
-        $params   = $event->getArgument('params');
-        $moduleId = (int) ($params->moduleid ?? 0);
+        $params    = $event->getArgument('params');
+        $moduleIds = $params->moduleid ?? [];
 
-        if ($moduleId <= 0) {
+        if (!is_array($moduleIds)) {
+            $moduleIds = [$moduleIds];
+        }
+
+        $moduleIds = array_values(array_unique(array_filter(array_map('intval', $moduleIds))));
+
+        if ($moduleIds === []) {
             $this->logTask('Error: Missing Pretty Reviews module ID.', 'error');
             return TaskStatus::NO_RUN;
         }
 
         $db     = Factory::getContainer()->get(DatabaseInterface::class);
-        $module = new ModuleTable($db);
-
-        if (!$module->load($moduleId)) {
-            $this->logTask('Error: Module is not Pretty Reviews.', 'error');
-            return TaskStatus::NO_RUN;
-        }
-
-        // Check if the module is 'mod_prettyreviews'
-        if ($module->module !== 'mod_prettyreviews' || (int) $module->client_id !== 0) {
-            $this->logTask('Error: Module is not Pretty Reviews.', 'error');
-            return TaskStatus::NO_RUN;
-        }
-
-        $this->logTask('Fetching reviews for moduleId ' . $moduleId, 'info');
+        $failed = false;
 
         try {
             $moduleExtension = Factory::getApplication()->bootModule('mod_prettyreviews', 'site');
@@ -136,17 +127,41 @@ final class Prettyreviews extends CMSPlugin implements SubscriberInterface
                 return TaskStatus::KNOCKOUT;
             }
 
-            if (!$helper->refreshFromGoogle($moduleId)) {
-                $this->logTask('Error: Pretty Reviews did not write the review cache.', 'error');
-                return TaskStatus::KNOCKOUT;
+            foreach ($moduleIds as $moduleId) {
+                $module = new ModuleTable($db);
+
+                if (!$module->load($moduleId)) {
+                    $this->logTask('Error: Module ' . $moduleId . ' was not found.', 'error');
+                    $failed = true;
+                    continue;
+                }
+
+                if ($module->module !== 'mod_prettyreviews' || (int) $module->client_id !== 0) {
+                    $this->logTask('Error: Module ' . $moduleId . ' is not Pretty Reviews.', 'error');
+                    $failed = true;
+                    continue;
+                }
+
+                $this->logTask('Fetching reviews for moduleId ' . $moduleId, 'info');
+
+                if (!$helper->refreshFromGoogle($moduleId)) {
+                    $this->logTask('Error: Pretty Reviews did not write the review cache for moduleId ' . $moduleId . '.', 'error');
+                    $failed = true;
+                    continue;
+                }
+
+                $this->logTask('Success: Reviews have been updated for moduleId ' . $moduleId . '.', 'info');
             }
         } catch (\Throwable $e) {
             $this->logTask('Error: ' . $e->getMessage(), 'error');
             return TaskStatus::KNOCKOUT;
         }
 
-        $this->logTask('Success: Reviews have been updated!', 'info');
-        $this->logTask('Completed updating reviews for moduleId ' . $moduleId, 'info');
+        if ($failed) {
+            return TaskStatus::KNOCKOUT;
+        }
+
+        $this->logTask('Completed updating reviews for ' . count($moduleIds) . ' module(s).', 'info');
 
         return TaskStatus::OK;
     }
