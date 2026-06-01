@@ -7,7 +7,7 @@
     <license>GNU General Public License version 3, or later</license>
     <authorEmail>info@tlwebdesign.nl</authorEmail>
     <authorUrl>https://www.tlwebdesign.nl</authorUrl>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
     <description>PLG_TASK_PRETTYREVIEWS_DESCRIPTION</description>
     <namespace path="src">Joomla\Plugin\Task\Prettyreviews</namespace>
     <files>
@@ -16,8 +16,12 @@
         <folder>forms</folder>
     </files>
     <languages>
+        <language tag="de-DE">language/de-DE/plg_task_prettyreviews.ini</language>
+        <language tag="de-DE">language/de-DE/plg_task_prettyreviews.sys.ini</language>
         <language tag="en-GB">language/en-GB/plg_task_prettyreviews.ini</language>
         <language tag="en-GB">language/en-GB/plg_task_prettyreviews.sys.ini</language>
+        <language tag="fr-FR">language/fr-FR/plg_task_prettyreviews.ini</language>
+        <language tag="fr-FR">language/fr-FR/plg_task_prettyreviews.sys.ini</language>
         <language tag="nl-NL">language/nl-NL/plg_task_prettyreviews.ini</language>
         <language tag="nl-NL">language/nl-NL/plg_task_prettyreviews.sys.ini</language>
     </languages>
