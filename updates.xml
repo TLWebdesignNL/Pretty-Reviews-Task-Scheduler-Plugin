@@ -84,7 +84,7 @@
         <section>Plugin</section>
         <targetplatform name="joomla" version="((5\.[0-9])|(6\.[0-9]))"/>
     </update>
-<update>
+    <update>
         <name>Pretty Reviews Task Scheduler Plugin</name>
         <description>Automatically update Google Reviews from Pretty Reviews module.</description>
         <element>prettyreviews</element>
